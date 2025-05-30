@@ -22,4 +22,4 @@ EXPOSE 80
 # Tell ASP.NET Core to listen on port 80
 ENV ASPNETCORE_URLS=http://+:80
 
-ENTRYPOINT ["dotnet", "UrlShortener.dll"]
+ENTRYPOINT ["dotnet", "UrlShortener.API.dll"]
