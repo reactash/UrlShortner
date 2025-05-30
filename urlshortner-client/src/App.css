@@ -1,0 +1,139 @@
+:root {
+  background-color: #222831;
+  font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS", sans-serif;
+  color: aliceblue;
+}
+
+.home {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.heading {
+  font-size: 4rem;
+}
+
+.search {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 55rem;
+  height: 13rem;
+  background-color: #393e46;
+}
+
+.search-bar {
+  height: 3rem;
+  width: 20rem;
+  border-radius: 20px 0px 0 20px;
+  border: none;
+  padding: 0px 15px;
+}
+
+.btn {
+  height: 3rem;
+  cursor: pointer;
+  border-radius: 0px 20px 20px 0;
+  padding: 0px 10px;
+  background-color: #dfd0b8;
+  border: none;
+  font-weight: bold;
+}
+
+.btn:hover {
+  background-color: #ddb87c;
+}
+
+.description {
+  font-size: 1rem;
+  width: 55%;
+  text-align: center;
+}
+
+.shorten-url {
+  margin-top: 10px;
+  background-color: #dfd0b8;
+  width: 55rem;
+  height: 13rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.shorturl-text {
+  height: 3rem;
+  width: 20rem;
+  font-size: 1rem;
+  border-radius: 20px 0px 0 20px;
+  color: #222831;
+  background-color: white;
+  display: flex;
+  align-items: center; /* Vertically centers the content */
+  padding: 0px 15px;
+}
+
+.copy-url {
+  height: 3rem;
+  cursor: pointer;
+  border-radius: 0px 20px 20px 0;
+  padding: 0px 10px;
+  background-color: #393e46;
+  border: none;
+  font-weight: bold;
+  color: #dfd0b8;
+}
+
+.copy-url:hover {
+  background-color: rgb(107, 105, 105);
+}
+
+@media (max-width: 768px) {
+  .search,
+  .shorten-url
+  {
+    width: 90%;
+    height: auto;
+    flex-direction: column;
+    padding: 1rem;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .input-group{
+     flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .search-bar,
+  .shorturl-text,
+  .copy-url
+   {
+    width: 80%;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+
+  .btn{
+    width: 89.5%;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+
+  .heading {
+    font-size: 2.5rem;
+    text-align: center;
+  }
+
+  .description {
+    width: 90%;
+    font-size: 0.9rem;
+  }
+
+  .shorturl-text {
+    text-align: center;
+    justify-content: center;
+  }
+}

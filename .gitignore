@@ -1,0 +1,15 @@
+# Ignore .NET build files
+UrlShortener.API/bin/
+UrlShortener.API/obj/
+*.user
+*.suo
+
+# Ignore node modules
+urlshortener-client/node_modules/
+
+# Logs
+*.log
+
+# OS-specific
+.DS_Store
+Thumbs.db
