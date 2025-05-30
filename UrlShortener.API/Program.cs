@@ -9,6 +9,14 @@ using UrlShortener.Repository.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Get port from environment variable or default to 80
+var port = Environment.GetEnvironmentVariable("PORT") ?? "80";
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(int.Parse(port));
+});
+
 builder.Services.AddOpenApi();
 
 // register api versioning
