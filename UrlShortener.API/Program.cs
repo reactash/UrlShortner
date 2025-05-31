@@ -9,8 +9,16 @@ using UrlShortener.Repository.Interface;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Get port from environment variable or default to 80
-var port = Environment.GetEnvironmentVariable("PORT") ?? "80";
+// Get port from environment variable or default to 5116
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5116";
+
+// Get MongoDB connection string from environment
+var mongoConnectionString = Environment.GetEnvironmentVariable("MongoConnectionString");
+if (string.IsNullOrWhiteSpace(mongoConnectionString))
+{
+    throw new Exception("MongoDB connection string is not configured in environment variables.");
+}
+
 
 builder.WebHost.ConfigureKestrel(options =>
 {
@@ -19,7 +27,7 @@ builder.WebHost.ConfigureKestrel(options =>
 
 builder.Services.AddOpenApi();
 
-// register api versioning
+// register API versioning
 builder.Services.AddApiVersioning(options =>
 {
     options.AssumeDefaultVersionWhenUnspecified = true;
@@ -30,16 +38,15 @@ builder.Services.AddApiVersioning(options =>
 // register controller
 builder.Services.AddControllers();
 
-// register mongo db
+// still use appsettings.json for DB and collection names only
 builder.Services.Configure<MongoDbSettings>(
     builder.Configuration.GetSection("MongoDbSettings"));
 
-builder.Services.AddSingleton<IMongoClient>(s =>
-{
-    var settings = s.GetRequiredService<IOptions<MongoDbSettings>>().Value;
-    return new MongoClient(settings.ConnectionString);
-});
+// replace connection string usage here with env var
+builder.Services.AddSingleton<IMongoClient>(_ =>
+    new MongoClient(mongoConnectionString));
 
+// register MongoDB collection
 builder.Services.AddScoped(s =>
 {
     var settings = s.GetRequiredService<IOptions<MongoDbSettings>>().Value;
@@ -48,16 +55,16 @@ builder.Services.AddScoped(s =>
     return database.GetCollection<UrlMapping>(settings.CollectionName);
 });
 
-//adding dependencies
+// register dependencies
 builder.Services.AddScoped<IUrlRepository, UrlRepository>();
 builder.Services.AddScoped<IUrlProcessor, UrlProcessor>();
 
-// allow cors policy
+// allow CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173") // or your frontend domain in production
+        policy.WithOrigins("http://localhost:5173")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });
@@ -72,8 +79,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowReactApp");
 
-
 app.UseHttpsRedirection();
-// mapping controller
+
 app.MapControllers();
+
 app.Run();

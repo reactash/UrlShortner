@@ -72,7 +72,7 @@ namespace UrlShortener.Processor
 
             await this.urlRepository.CreateAsync(mapping);
 
-            return $"http://localhost:5116/api/v1.0/url/s/{shorturl}";
+            return $"https://urlshortner-ziaw.onrender.com/s/{shorturl}";
         }
 
         public async Task<string> RedirectToLongUrl(string shortCode)
