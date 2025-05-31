@@ -8,7 +8,7 @@ const axiosInstance  = axios.create({
 });
 
 //
-export const sortenUrl= async (longUrl)=>{
+export const sortenUrl= async (longUrl: string)=>{
     const response= await axiosInstance.post('shorten',{
      LongUrl:longUrl
     });

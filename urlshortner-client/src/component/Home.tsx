@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 import { sortenUrl } from "../urlService";
 
 const Home = () => {
@@ -16,6 +16,7 @@ const Home = () => {
       await navigator.clipboard.writeText(sortUrl);
       alert('url copied');
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     }catch (err)
     {
       console.log('Failed to copy');
@@ -43,7 +44,7 @@ const Home = () => {
      
     } catch (err) {
       console.log(err);
-      const msg = err.response?.data?.message || "Failed to shorten URL";
+      const msg =  "Failed to shorten URL";
       setError(msg);
     }
   };

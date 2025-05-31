@@ -1,8 +1,7 @@
 import './App.css'
-import Home from './component/Home';
+import Home from './component/Home'
 
-function App() {
-
+const App=()=> {
   return (
     <>
       <Home/>
@@ -10,4 +9,4 @@ function App() {
   )
 }
 
-export default App
+export default App;
