@@ -3,6 +3,8 @@ UrlShortener.API/bin/
 UrlShortener.API/obj/
 *.user
 *.suo
+.env*
+
 
 # Ignore node modules
 urlshortener-client/node_modules/
