@@ -64,7 +64,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:5173")
+        policy.WithOrigins("https://url-shortner-opal-seven.vercel.app/")
               .AllowAnyHeader()
               .AllowAnyMethod();
     });

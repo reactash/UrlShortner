@@ -5,8 +5,6 @@ using UrlShortener.Models.Url;
 namespace UrlShortener.API.Controller
 {
 [ApiController]
-[ApiVersion("1.0")]
-[Route("api/v{version:apiVersion}/[controller]")]
 public class UrlController : ControllerBase
 {
     private readonly IUrlProcessor urlProcessor;
