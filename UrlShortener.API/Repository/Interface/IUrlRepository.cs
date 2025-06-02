@@ -1,8 +1,7 @@
-
 using UrlShortener.API.Models;
-using UrlShortener.Models.Url;
 
-namespace UrlShortener.Repository.Interface
+
+namespace UrlShortener.API.Repository.Interface
 {
     public interface IUrlRepository
     {

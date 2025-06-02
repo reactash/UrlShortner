@@ -1,21 +1,25 @@
 using System.Text.RegularExpressions;
 using UrlShortener.API.Models;
 using UrlShortener.API.Processor.Inteface;
+using UrlShortener.API.Repository.Interface;
+using UrlShortener.API.Service;
 using UrlShortener.Models.Url;
-using UrlShortener.Repository.Interface;
+
 
 namespace UrlShortener.Processor
 {
     public class UrlProcessor : IUrlProcessor
     {
         private readonly IUrlRepository urlRepository;
+        private readonly IRedisCacheService redisCacheService;
         private const int ShortCodeLength = 6;
         private const string AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 
-        public UrlProcessor(IUrlRepository urlRepository)
+        public UrlProcessor(IUrlRepository urlRepository, IRedisCacheService redisCacheService)
         {
             this.urlRepository = urlRepository;
+            this.redisCacheService = redisCacheService;
         }
 
         private string GenerateShortCode()
@@ -72,19 +76,34 @@ namespace UrlShortener.Processor
 
             await this.urlRepository.CreateAsync(mapping);
 
+             // ✅ Cache the new short URL in Redis
+            redisCacheService.Set(shorturl, longUrl, TimeSpan.FromHours(1));
+
             return $"https://urlshortner-ziaw.onrender.com/s/{shorturl}";
         }
 
         public async Task<string> RedirectToLongUrl(string shortCode)
         {
             if (string.IsNullOrEmpty(shortCode))
-            {
                 return string.Empty;
+
+            // check if it exists in redis
+            var cachedLongUrl = redisCacheService.Get(shortCode);
+            if (!string.IsNullOrEmpty(cachedLongUrl))
+            {
+                return cachedLongUrl;
             }
 
-            var originalurl = await this.urlRepository.GetByShortUrlAsync(shortCode);
+            //fetch from db
+            var originalurl = await urlRepository.GetByShortUrlAsync(shortCode);
+            if (originalurl == null)
+                return string.Empty;
 
-            return originalurl?.LongUrl;
+            //set it in our redis
+            redisCacheService.Set(shortCode, originalurl.LongUrl, TimeSpan.FromHours(1));
+
+            return originalurl.LongUrl;
         }
+
     }
 }
