@@ -1,6 +1,6 @@
 using MongoDB.Driver;
 using UrlShortener.API.Models;
-using UrlShortener.Repository.Interface;
+using UrlShortener.API.Repository.Interface;
 
 namespace UrlShortener.Repository
 {
