@@ -67,7 +67,9 @@ namespace UrlShortener.API.Controller
         [HttpGet("s/{shortCode}")] // fix: override route to match public URL
         public async Task<IActionResult> RedirectToLongUrl(string shortCode)
         {
-             var ip =  HttpContext.Connection.RemoteIpAddress?.ToString();
+            var ip = Request.Headers["X-Forwarded-For"].FirstOrDefault()
+                    ?? HttpContext.Connection.RemoteIpAddress?.ToString();
+
             /*  var forwardFor = Request.Headers["X-Forward-For"].FirstOrDefault();
               ip = !string.IsNullOrEmpty(forwardFor) ? forwardFor : ip;
 

@@ -96,6 +96,17 @@ namespace UrlShortener.Processor
 
             var location = await GetLocationFromIpAsync(ip);
 
+            var urlAnalytics = new UrlAnalytics
+            {
+                Location = location,
+                Ip = ip,
+                ShortUrl = shortCode,
+                Browser = browserInfo.Browser,
+                Platform = browserInfo.Platform,
+            };
+
+            await urlRepository.StoreAnalyticsDataAsync(urlAnalytics);
+
             // check if it exists in redis
             var cachedLongUrl = redisCacheService.Get(shortCode);
             if (!string.IsNullOrEmpty(cachedLongUrl))
@@ -110,18 +121,6 @@ namespace UrlShortener.Processor
 
             //set it in our redis
             redisCacheService.Set(shortCode, originalurl.LongUrl, TimeSpan.FromHours(1));
-
-            var urlAnalytics = new UrlAnalytics
-            {
-                Location = location,
-                Ip = ip,
-                Url = originalurl.LongUrl,
-                ShortUrl= shortCode,
-                Browser = browserInfo.Browser,
-                Platform=browserInfo.Platform,
-            };
-
-           await  urlRepository.StoreAnalyticsDataAsync(urlAnalytics);
 
             return originalurl.LongUrl;
         }

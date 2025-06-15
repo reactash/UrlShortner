@@ -15,3 +15,4 @@ urlshortener-client/node_modules/
 # OS-specific
 .DS_Store
 Thumbs.db
+/UrlShortener.API/.vs/UrlShortener.API
