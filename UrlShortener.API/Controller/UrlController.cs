@@ -20,7 +20,14 @@ namespace UrlShortener.API.Controller
         [HttpGet("ping")]
         public IActionResult Ping()
         {
-            return Ok("API is working");
+            var ip =  HttpContext.Connection.RemoteIpAddress?.ToString();
+            var forwardFor = Request.Headers["X-Forward-For"].FirstOrDefault();
+            ip = !string.IsNullOrEmpty(forwardFor) ? forwardFor : ip;
+
+            var userAgent = Request.Headers["User-Agent"].ToString();
+            var browserInfo = UserAgentParser.ParserUserAgent(userAgent); 
+
+            return Ok($"API is working on ip - {ip}: {browserInfo.Browser}:{browserInfo.Platform}");
         }
         [HttpGet("test-mongo")]
         public IActionResult TestMongo([FromServices] IMongoClient mongoClient, [FromServices] IOptions<MongoDbSettings> settings)
@@ -60,7 +67,15 @@ namespace UrlShortener.API.Controller
         [HttpGet("s/{shortCode}")] // fix: override route to match public URL
         public async Task<IActionResult> RedirectToLongUrl(string shortCode)
         {
-            var originalUrl = await urlProcessor.RedirectToLongUrl(shortCode);
+             var ip =  HttpContext.Connection.RemoteIpAddress?.ToString();
+            /*  var forwardFor = Request.Headers["X-Forward-For"].FirstOrDefault();
+              ip = !string.IsNullOrEmpty(forwardFor) ? forwardFor : ip;
+
+              */
+
+            var userAgent = Request.Headers["User-Agent"].ToString();
+  
+            var originalUrl = await urlProcessor.RedirectToLongUrl(shortCode,ip,userAgent);
             if (string.IsNullOrEmpty(originalUrl))
                 return NotFound();
 

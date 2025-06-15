@@ -1,5 +1,8 @@
+using System.Net.Http;
 using System.Text.RegularExpressions;
+using UAParser;
 using UrlShortener.API.Models;
+using UrlShortener.API.Models.Analytics;
 using UrlShortener.API.Processor.Inteface;
 using UrlShortener.API.Repository.Interface;
 using UrlShortener.API.Service;
@@ -12,14 +15,16 @@ namespace UrlShortener.Processor
     {
         private readonly IUrlRepository urlRepository;
         private readonly IRedisCacheService redisCacheService;
+        private readonly HttpClient httpClient;
         private const int ShortCodeLength = 6;
         private const string AllowedChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
 
-        public UrlProcessor(IUrlRepository urlRepository, IRedisCacheService redisCacheService)
+        public UrlProcessor(IUrlRepository urlRepository, IRedisCacheService redisCacheService, IHttpClientFactory httpClientFactory)
         {
             this.urlRepository = urlRepository;
             this.redisCacheService = redisCacheService;
+            httpClient = httpClientFactory.CreateClient();
         }
 
         private string GenerateShortCode()
@@ -76,16 +81,20 @@ namespace UrlShortener.Processor
 
             await this.urlRepository.CreateAsync(mapping);
 
-             // ✅ Cache the new short URL in Redis
+            // ✅ Cache the new short URL in Redis
             redisCacheService.Set(shorturl, longUrl, TimeSpan.FromHours(1));
 
             return $"https://urlshortner-ziaw.onrender.com/s/{shorturl}";
         }
 
-        public async Task<string> RedirectToLongUrl(string shortCode)
+        public async Task<string> RedirectToLongUrl(string shortCode, string ip, string userAgent)
         {
             if (string.IsNullOrEmpty(shortCode))
                 return string.Empty;
+
+            var browserInfo = UserAgentParser.ParserUserAgent(userAgent);
+
+            var location = await GetLocationFromIpAsync(ip);
 
             // check if it exists in redis
             var cachedLongUrl = redisCacheService.Get(shortCode);
@@ -102,8 +111,45 @@ namespace UrlShortener.Processor
             //set it in our redis
             redisCacheService.Set(shortCode, originalurl.LongUrl, TimeSpan.FromHours(1));
 
+            var urlAnalytics = new UrlAnalytics
+            {
+                Location = location,
+                Ip = ip,
+                Url = originalurl.LongUrl,
+                ShortUrl= shortCode,
+                Browser = browserInfo.Browser,
+                Platform=browserInfo.Platform,
+            };
+
+           await  urlRepository.StoreAnalyticsDataAsync(urlAnalytics);
+
             return originalurl.LongUrl;
         }
 
+        private async Task<Location> GetLocationFromIpAsync(string ip)
+        {
+            try
+            {
+
+                //api call of public api to get locations on the basis of ip
+                var response = await httpClient.GetFromJsonAsync<Location>($"http://ip-api.com/json/{ip}");
+
+                if (response != null)
+                {
+                    return new Location
+                    {
+                        City = response.City,
+                        Region = response.Region,
+                        Country = response.Country
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                throw;
+            }
+            return null;
+
+        }
     }
 }
