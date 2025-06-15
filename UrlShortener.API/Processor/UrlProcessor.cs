@@ -1,4 +1,5 @@
 using System.Net.Http;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using UAParser;
 using UrlShortener.API.Models;
@@ -127,19 +128,33 @@ namespace UrlShortener.Processor
 
         private async Task<Location> GetLocationFromIpAsync(string ip)
         {
+            if (string.IsNullOrEmpty(ip))
+                return null;
+
+            var ipStr=ip.Split(',').FirstOrDefault()?.Trim(); // handle multiple IPs in the header
+
             try
             {
 
                 //api call of public api to get locations on the basis of ip
-                var response = await httpClient.GetFromJsonAsync<Location>($"http://ip-api.com/json/{ip}");
+                var response = await httpClient.GetAsync($"http://ip-api.com/json/{ipStr}");
+
 
                 if (response != null)
                 {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var location = JsonSerializer.Deserialize<Location>(content);
+
                     return new Location
                     {
-                        City = response.City,
-                        Region = response.Region,
-                        Country = response.Country
+                        City = location.City,
+                        Region = location.Region,
+                        Country = location.Country,
+                        Zip = location.Zip,
+                        CountryCode = location.CountryCode,
+                        Timezone = location.Timezone,
+                        Isp = location.Isp,
+                        RegionName = location.RegionName
                     };
                 }
             }
