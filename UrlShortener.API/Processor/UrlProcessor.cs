@@ -128,6 +128,7 @@ namespace UrlShortener.Processor
 
         private async Task<Location> GetLocationFromIpAsync(string ip)
         {
+            ip = "38.183.62.30, 172.68.174.207, 10.223.144.83";
             if (string.IsNullOrEmpty(ip))
                 return null;
 
