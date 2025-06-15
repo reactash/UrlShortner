@@ -52,8 +52,7 @@ builder.Services.AddScoped(s =>
 {
     var settings = s.GetRequiredService<IOptions<MongoDbSettings>>().Value;
     var client = s.GetRequiredService<IMongoClient>();
-    var database = client.GetDatabase(settings.DatabaseName);
-    return database.GetCollection<UrlMapping>(settings.CollectionName);
+    return client.GetDatabase(settings.DatabaseName);
 });
 
 // register dependencies
@@ -65,6 +64,8 @@ builder.Services.AddSingleton<IRedisCacheService>(sp =>
     var redisConnectionString = Environment.GetEnvironmentVariable("RedisConnectionString");
     return new RedisCacheService(redisConnectionString);
 });
+
+builder.Services.AddHttpClient();
 
 
 // allow CORS
@@ -87,6 +88,7 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseHttpsRedirection();
+
 }
 
 
